@@ -14,7 +14,8 @@ class PapersManager:
 
     Attributes
     ----------
-    TBW
+    paper_list : list
+        Resulting paper list by SearchQuery method of ADS package
 
     Methods
     -------
@@ -163,6 +164,21 @@ class PapersManager:
             elif logical_op == 'or':
                 for submask in masks:
                     mask = mask | submask
+        return self.papers_df.loc[mask]
+
+    def search_year(self, years):
+        """
+        Search papers by year
+        """
+        if isinstance(years, int):
+            mask = self.papers_df['year'].values == str(years)
+        else:
+            masks = [self.papers_df['year'].values == str(year)
+                     for year in years]
+            print(masks)
+            mask = np.zeros_like(masks[0][0])
+            for submask in masks:
+                mask = mask | submask
         return self.papers_df.loc[mask]
 
     def get_author_set(self):
