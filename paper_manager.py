@@ -220,7 +220,7 @@ class PapersManager:
         authors_set = set(authors_list_clean)
         return authors_set
 
-    def custom_output(self, fields, explicit=None, auth_num=None):
+    def custom_output(self, fields, explicit=[], auth_num=None):
         """
         Generates a custom output in a particular format
         """
