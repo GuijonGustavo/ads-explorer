@@ -134,7 +134,13 @@ class PapersManager:
                 for elem in match_list:
                     match_id += elem[1]
         match_id_set = set(match_id)
-        return self.papers_df.loc[match_id_set]
+        if len(match_id_set) != 0:
+            papers_list = [self.papers_list[i] for i in match_id_set]
+            return PapersManager(papers_list)
+        else:
+            print('Not match found')
+            return None
+        # return self.papers_df.loc[match_id_set]
 
     def search_word(self, words, logical_op='and'):
         """
@@ -165,7 +171,16 @@ class PapersManager:
             elif logical_op == 'or':
                 for submask in masks:
                     mask = mask | submask
-        return self.papers_df.loc[mask]
+        if not mask.sum() == 0:
+            papers_list = []
+            for i, val in enumerate(mask):
+                if val:
+                    papers_list.append(self.papers_list[i])
+            return PapersManager(papers_list)
+        else:
+            print('Not match found')
+            return None
+        # return self.papers_df.loc[mask]
 
     def search_year(self, years):
         """
@@ -180,7 +195,16 @@ class PapersManager:
             mask = np.zeros_like(masks[0][0])
             for submask in masks:
                 mask = mask | submask
-        return self.papers_df.loc[mask]
+        if not mask.sum() == 0:
+            papers_list = []
+            for i, val in enumerate(mask):
+                if val:
+                    papers_list.append(self.papers_list[i])
+            return PapersManager(papers_list)
+        else:
+            print('Not match found')
+            return None
+        # return self.papers_df.loc[mask]
 
     def get_author_set(self):
         """
@@ -196,7 +220,10 @@ class PapersManager:
         authors_set = set(authors_list_clean)
         return authors_set
 
-    def custom_output(self, fields, explicit=None, auth_num=None):
+    def custom_output(self, fields, explicit=[], auth_num=None):
+        """
+        Generates a custom output in a particular format
+        """
         if fields is None:
             print('No output fields specified, no output generated')
             return
