@@ -3,4 +3,4 @@ ads
 pandas
 numpy
 itertools
-methaphone
+metaphone
