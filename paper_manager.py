@@ -3,6 +3,7 @@ Script to do something with the list of papers
 """
 
 import itertools
+import ads
 from metaphone import doublemetaphone
 import numpy as np
 import pandas as pd
@@ -42,7 +43,7 @@ class PapersManager:
         papers_df = pd.DataFrame(columns=columns)
         for paper in self.papers_list:
             papers_df = papers_df.append(paper._raw, ignore_index=True)
-        papers_df.set_index('id', inplace=True)
+        # papers_df.set_index('id', inplace=True)
         return papers_df
 
     def add_combinations_to_directory(self, name_tuple_list, person_id):
@@ -195,6 +196,62 @@ class PapersManager:
         authors_set = set(authors_list_clean)
         return authors_set
 
+    def custom_output(self, fields, explicit=None, auth_num=None):
+        if fields is None:
+            print('No output fields specified, no output generated')
+            return
+        datafr = self.papers_df
+        if isinstance(fields, str):
+            for elem in list(datafr[fields]):
+                print(f'· {elem[0]}')
+        else:
+            for kel in range(len(list(datafr[fields[0]]))):
+                for kf in range(len(fields)):
+                    elem = datafr[fields[kf]][kel]
+                    if fields[kf] in explicit:
+                        fname = fields[kf]+': '
+                    else:
+                        fname = ''
+                    if isinstance(elem, list):
+                        if len(elem) == 1:
+                            print(f'{fname}{elem[0]}')
+                        else:
+                            print(fname+', '.join(elem))
+                    else:
+                        print(f'{fname}{elem}')
+                    # print(datafr[fields[kf]][kel])
+                    # print('')
+                print('\n')
+
+    def add_paper(self, bibcode):
+        """
+        Add a paper to the database
+        """
+        fl = ['abstract', 'author', 'id', 'year',
+              'ack', 'aff', 'alternate_bibcode', 'alternate_title',
+              'arxiv_class', 'citation_count', 'bibcode', 'bibgroup',
+              'copyright', 'data', 'database', 'doctype', 'doi', 'identifier',
+              'indexstamp', 'first_author', 'grant', 'issue', 'keyword',
+              'page', 'property', 'pub', 'pubdate', 'read_count', 'reference',
+              'citation', 'title', 'vizier', 'volume', 'orcid_pub',
+              'orcid_user', 'orcid_other', 'metrics', 'bibtex']
+        new_paper = list(ads.SearchQuery(bibcode=bibcode, fl=fl))
+        self.papers_list += new_paper
+        self.papers_df = self.make_pandas()
+        self.lookup_dict = ({}, {})
+        self.set_lookup_dir()
+
+    def remove_paper(self, bibcode):
+        """
+        Remove a paper to the database
+        """
+        mask = self.papers_df.bibcode == bibcode
+        idx = (self.papers_df.index[mask]).values[0]
+        self.papers_list.pop(idx)
+        self.papers_df = self.make_pandas()
+        self.lookup_dict = ({}, {})
+        self.set_lookup_dir()
+
 
 def normalize(string):
     """
@@ -206,6 +263,9 @@ def normalize(string):
         ("í", "i"),
         ("ó", "o"),
         ("ú", "u"),
+        ("à", "a"),
+        ("è", "e"),
+        ("ù", "u"),
     )
     for vowel_w_acc, vowel_wo_acc in replacements:
         string = string.replace(vowel_w_acc,
