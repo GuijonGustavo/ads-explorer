@@ -4,7 +4,7 @@ Package to get stats on an author's papers and give usefull information from ADS
 # Installation
 Install this package by run:
 ```
-pip install adsexplorer
+pip install adsexplore
 ```
 
 This package use the `ads` package (https://github.com/andycasey/ads).
