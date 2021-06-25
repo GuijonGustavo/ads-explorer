@@ -13,6 +13,6 @@ setup(
     install_requires=[
         "ads",
         "werkzeug == 1.0.1",
-        "methapone"
+        "metaphone"
     ],
 )
